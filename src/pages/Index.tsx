@@ -1,20 +1,76 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import Icon from '@/components/ui/icon';
 import GraphicEditor from '@/components/GraphicEditor';
+import AuthModal from '@/components/auth/AuthModal';
+import UserProfile from '@/components/profile/UserProfile';
+import UploadWorkModal from '@/components/upload/UploadWorkModal';
+import PurchaseModal from '@/components/monetization/PurchaseModal';
 
 const Index = () => {
   const [theme, setTheme] = useState<'dark' | 'light'>('dark');
   const [showEditor, setShowEditor] = useState(false);
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const [showProfile, setShowProfile] = useState(false);
+  const [showUploadModal, setShowUploadModal] = useState(false);
+  const [showPurchaseModal, setShowPurchaseModal] = useState(false);
+  const [selectedWork, setSelectedWork] = useState<any>(null);
+  const [user, setUser] = useState<any>(null);
+
+  useEffect(() => {
+    const savedUser = localStorage.getItem('comicverse_user');
+    if (savedUser) {
+      setUser(JSON.parse(savedUser));
+    }
+  }, []);
 
   const toggleTheme = () => {
     setTheme(theme === 'dark' ? 'light' : 'dark');
     document.documentElement.classList.toggle('dark');
+  };
+
+  const handleLogin = (userData: any) => {
+    setUser(userData);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('comicverse_user');
+    setUser(null);
+    setShowProfile(false);
+  };
+
+  const handlePurchase = (workId: number, price: number) => {
+    if (user) {
+      const updatedUser = {
+        ...user,
+        balance: user.balance - price
+      };
+      setUser(updatedUser);
+      localStorage.setItem('comicverse_user', JSON.stringify(updatedUser));
+    }
+  };
+
+  const handleUploadWork = (work: any) => {
+    console.log('New work uploaded:', work);
+  };
+
+  const handleReadClick = (comic: any) => {
+    if (!user) {
+      setShowAuthModal(true);
+      return;
+    }
+    
+    if (comic.isPremium) {
+      setSelectedWork(comic);
+      setShowPurchaseModal(true);
+    } else {
+      console.log('Reading free comic:', comic.title);
+    }
   };
 
   const featuredComics = [
@@ -99,6 +155,10 @@ const Index = () => {
     { name: 'Иван Кедров', works: 15, followers: 41300, avatar: 'ИК' }
   ];
 
+  if (showProfile && user) {
+    return <UserProfile user={user} onClose={() => setShowProfile(false)} />;
+  }
+
   return (
     <div className={`min-h-screen transition-colors duration-300`}>
       <header className="sticky top-0 z-50 border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -116,7 +176,13 @@ const Index = () => {
             <a href="#" className="text-sm font-medium hover:text-primary transition-colors">Каталог</a>
             <a href="#" className="text-sm font-medium hover:text-primary transition-colors">Топы</a>
             <a href="#" className="text-sm font-medium hover:text-primary transition-colors">Авторы</a>
-            <button onClick={() => setShowEditor(true)} className="text-sm font-medium hover:text-primary transition-colors">Редактор</button>
+            <button onClick={() => {
+              if (!user) {
+                setShowAuthModal(true);
+              } else {
+                setShowEditor(true);
+              }
+            }} className="text-sm font-medium hover:text-primary transition-colors">Редактор</button>
           </nav>
 
           <div className="flex items-center gap-3">
@@ -128,12 +194,40 @@ const Index = () => {
             >
               <Icon name={theme === 'dark' ? 'Sun' : 'Moon'} size={20} />
             </Button>
-            <Button variant="outline" className="hidden md:flex">
-              Войти
-            </Button>
-            <Button onClick={() => setShowEditor(true)} className="bg-primary hover:bg-primary/90">
-              Создать
-            </Button>
+            
+            {user ? (
+              <>
+                <Button variant="outline" className="hidden md:flex" onClick={() => setShowUploadModal(true)}>
+                  <Icon name="Upload" size={16} className="mr-2" />
+                  Загрузить
+                </Button>
+                <Button 
+                  variant="ghost" 
+                  size="icon"
+                  onClick={() => setShowProfile(true)}
+                  className="relative"
+                >
+                  <Avatar className="w-8 h-8 border-2 border-primary">
+                    <AvatarFallback className="bg-primary/20 text-primary text-xs">
+                      {user.avatar}
+                    </AvatarFallback>
+                  </Avatar>
+                </Button>
+                <div className="hidden md:flex flex-col items-end">
+                  <span className="text-xs text-muted-foreground">Баланс</span>
+                  <span className="text-sm font-bold text-primary">{user.balance}₽</span>
+                </div>
+              </>
+            ) : (
+              <>
+                <Button variant="outline" className="hidden md:flex" onClick={() => setShowAuthModal(true)}>
+                  Войти
+                </Button>
+                <Button onClick={() => setShowAuthModal(true)} className="bg-primary hover:bg-primary/90">
+                  Создать
+                </Button>
+              </>
+            )}
           </div>
         </div>
       </header>
@@ -155,7 +249,7 @@ const Index = () => {
               Первая платформа с полной защитой авторских прав, встроенным редактором и честной монетизацией для художников из России и СНГ
             </p>
             <div className="flex flex-wrap gap-4 justify-center pt-4">
-              <Button size="lg" className="bg-primary hover:bg-primary/90 text-lg px-8">
+              <Button size="lg" className="bg-primary hover:bg-primary/90 text-lg px-8" onClick={() => user ? setShowEditor(true) : setShowAuthModal(true)}>
                 <Icon name="Rocket" size={20} className="mr-2" />
                 Начать создавать
               </Button>
@@ -244,9 +338,12 @@ const Index = () => {
                     </div>
                   </div>
 
-                  <Button className="w-full bg-primary hover:bg-primary/90">
+                  <Button 
+                    className="w-full bg-primary hover:bg-primary/90"
+                    onClick={() => handleReadClick(comic)}
+                  >
                     <Icon name="BookOpen" size={16} className="mr-2" />
-                    Читать
+                    {comic.isPremium ? `Купить ${comic.price}₽` : 'Читать бесплатно'}
                   </Button>
                 </div>
               </Card>
@@ -376,7 +473,7 @@ const Index = () => {
                 Присоединяйся к 12,000+ авторов, которые уже создают и зарабатывают на ComicVerse
               </p>
               <div className="flex flex-wrap gap-4 justify-center">
-                <Button size="lg" className="bg-primary hover:bg-primary/90 text-lg px-8">
+                <Button size="lg" className="bg-primary hover:bg-primary/90 text-lg px-8" onClick={() => setShowAuthModal(true)}>
                   <Icon name="Pencil" size={20} className="mr-2" />
                   Создать аккаунт
                 </Button>
@@ -460,6 +557,31 @@ const Index = () => {
           </div>
         </DialogContent>
       </Dialog>
+
+      <AuthModal 
+        isOpen={showAuthModal} 
+        onClose={() => setShowAuthModal(false)}
+        onLogin={handleLogin}
+      />
+
+      <UploadWorkModal
+        isOpen={showUploadModal}
+        onClose={() => setShowUploadModal(false)}
+        onUpload={handleUploadWork}
+      />
+
+      {selectedWork && (
+        <PurchaseModal
+          isOpen={showPurchaseModal}
+          onClose={() => {
+            setShowPurchaseModal(false);
+            setSelectedWork(null);
+          }}
+          work={selectedWork}
+          userBalance={user?.balance || 0}
+          onPurchase={handlePurchase}
+        />
+      )}
     </div>
   );
 };
