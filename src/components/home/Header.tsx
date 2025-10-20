@@ -10,6 +10,7 @@ interface HeaderProps {
   onShowEditor: () => void;
   onShowUpload: () => void;
   onShowProfile: () => void;
+  onNavigate?: (page: 'home' | 'catalog' | 'authors' | 'pricing' | 'community') => void;
 }
 
 const Header = ({
@@ -19,7 +20,8 @@ const Header = ({
   onShowAuth,
   onShowEditor,
   onShowUpload,
-  onShowProfile
+  onShowProfile,
+  onNavigate
 }: HeaderProps) => {
   const handleEditorClick = () => {
     if (!user) {
@@ -32,19 +34,20 @@ const Header = ({
   return (
     <header className="sticky top-0 z-50 border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-        <div className="flex items-center gap-2">
+        <button onClick={() => onNavigate?.('home')} className="flex items-center gap-2">
           <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
             <Icon name="BookOpen" size={24} className="text-white" />
           </div>
           <span className="text-2xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
             ComicVerse
           </span>
-        </div>
+        </button>
         
         <nav className="hidden md:flex items-center gap-6">
-          <a href="#" className="text-sm font-medium hover:text-primary transition-colors">Каталог</a>
-          <a href="#" className="text-sm font-medium hover:text-primary transition-colors">Топы</a>
-          <a href="#" className="text-sm font-medium hover:text-primary transition-colors">Авторы</a>
+          <button onClick={() => onNavigate?.('catalog')} className="text-sm font-medium hover:text-primary transition-colors">Каталог</button>
+          <button onClick={() => onNavigate?.('community')} className="text-sm font-medium hover:text-primary transition-colors">Сообщество</button>
+          <button onClick={() => onNavigate?.('authors')} className="text-sm font-medium hover:text-primary transition-colors">Авторы</button>
+          <button onClick={() => onNavigate?.('pricing')} className="text-sm font-medium hover:text-primary transition-colors">Цены</button>
           <button onClick={handleEditorClick} className="text-sm font-medium hover:text-primary transition-colors">
             Редактор
           </button>

@@ -13,8 +13,13 @@ import TopsSection from '@/components/home/TopsSection';
 import FeaturesSection from '@/components/home/FeaturesSection';
 import CTASection from '@/components/home/CTASection';
 import Footer from '@/components/home/Footer';
+import Catalog from './Catalog';
+import Authors from './Authors';
+import Pricing from './Pricing';
+import Community from './Community';
 
 const Index = () => {
+  const [currentPage, setCurrentPage] = useState<'home' | 'catalog' | 'authors' | 'pricing' | 'community'>('home');
   const [theme, setTheme] = useState<'dark' | 'light'>('dark');
   const [showEditor, setShowEditor] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
@@ -161,6 +166,33 @@ const Index = () => {
     return <UserProfile user={user} onClose={() => setShowProfile(false)} />;
   }
 
+  const commonProps = {
+    theme,
+    user,
+    onToggleTheme: toggleTheme,
+    onShowAuth: () => setShowAuthModal(true),
+    onShowEditor: () => setShowEditor(true),
+    onShowUpload: () => setShowUploadModal(true),
+    onShowProfile: () => setShowProfile(true),
+    onBack: () => setCurrentPage('home')
+  };
+
+  if (currentPage === 'catalog') {
+    return <Catalog {...commonProps} />;
+  }
+
+  if (currentPage === 'authors') {
+    return <Authors {...commonProps} />;
+  }
+
+  if (currentPage === 'pricing') {
+    return <Pricing {...commonProps} />;
+  }
+
+  if (currentPage === 'community') {
+    return <Community {...commonProps} />;
+  }
+
   return (
     <div className="min-h-screen transition-colors duration-300">
       <Header
@@ -171,6 +203,7 @@ const Index = () => {
         onShowEditor={() => setShowEditor(true)}
         onShowUpload={() => setShowUploadModal(true)}
         onShowProfile={() => setShowProfile(true)}
+        onNavigate={setCurrentPage}
       />
 
       <HeroSection
@@ -193,7 +226,7 @@ const Index = () => {
 
       <CTASection onShowAuth={() => setShowAuthModal(true)} />
 
-      <Footer />
+      <Footer onNavigate={setCurrentPage} />
 
       <Dialog open={showEditor} onOpenChange={setShowEditor}>
         <DialogContent className="max-w-[98vw] h-[95vh] p-6">

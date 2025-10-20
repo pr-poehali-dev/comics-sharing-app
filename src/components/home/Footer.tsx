@@ -1,7 +1,11 @@
 import { Button } from '@/components/ui/button';
 import Icon from '@/components/ui/icon';
 
-const Footer = () => {
+interface FooterProps {
+  onNavigate?: (page: 'home' | 'catalog' | 'authors' | 'pricing' | 'community') => void;
+}
+
+const Footer = ({ onNavigate }: FooterProps) => {
   return (
     <footer className="border-t border-border/40 py-12 bg-secondary/20">
       <div className="container mx-auto px-4">
@@ -21,20 +25,20 @@ const Footer = () => {
           <div>
             <h4 className="font-bold mb-4">Платформа</h4>
             <ul className="space-y-2 text-sm text-muted-foreground">
-              <li><a href="#" className="hover:text-primary transition-colors">Каталог</a></li>
-              <li><a href="#" className="hover:text-primary transition-colors">Редактор</a></li>
-              <li><a href="#" className="hover:text-primary transition-colors">Авторы</a></li>
-              <li><a href="#" className="hover:text-primary transition-colors">Цены</a></li>
+              <li><button onClick={() => onNavigate?.('catalog')} className="hover:text-primary transition-colors">Каталог</button></li>
+              <li><button onClick={() => onNavigate?.('home')} className="hover:text-primary transition-colors">Редактор</button></li>
+              <li><button onClick={() => onNavigate?.('authors')} className="hover:text-primary transition-colors">Авторы</button></li>
+              <li><button onClick={() => onNavigate?.('pricing')} className="hover:text-primary transition-colors">Цены</button></li>
             </ul>
           </div>
 
           <div>
             <h4 className="font-bold mb-4">Поддержка</h4>
             <ul className="space-y-2 text-sm text-muted-foreground">
-              <li><a href="#" className="hover:text-primary transition-colors">FAQ</a></li>
-              <li><a href="#" className="hover:text-primary transition-colors">Документация</a></li>
-              <li><a href="#" className="hover:text-primary transition-colors">Контакты</a></li>
-              <li><a href="#" className="hover:text-primary transition-colors">Сообщество</a></li>
+              <li><button className="hover:text-primary transition-colors">FAQ</button></li>
+              <li><button className="hover:text-primary transition-colors">Документация</button></li>
+              <li><button className="hover:text-primary transition-colors">Контакты</button></li>
+              <li><button onClick={() => onNavigate?.('community')} className="hover:text-primary transition-colors">Сообщество</button></li>
             </ul>
           </div>
 
