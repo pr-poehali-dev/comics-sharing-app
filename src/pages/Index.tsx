@@ -4,10 +4,13 @@ import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import Icon from '@/components/ui/icon';
+import GraphicEditor from '@/components/GraphicEditor';
 
 const Index = () => {
   const [theme, setTheme] = useState<'dark' | 'light'>('dark');
+  const [showEditor, setShowEditor] = useState(false);
 
   const toggleTheme = () => {
     setTheme(theme === 'dark' ? 'light' : 'dark');
@@ -113,7 +116,7 @@ const Index = () => {
             <a href="#" className="text-sm font-medium hover:text-primary transition-colors">Каталог</a>
             <a href="#" className="text-sm font-medium hover:text-primary transition-colors">Топы</a>
             <a href="#" className="text-sm font-medium hover:text-primary transition-colors">Авторы</a>
-            <a href="#" className="text-sm font-medium hover:text-primary transition-colors">Редактор</a>
+            <button onClick={() => setShowEditor(true)} className="text-sm font-medium hover:text-primary transition-colors">Редактор</button>
           </nav>
 
           <div className="flex items-center gap-3">
@@ -128,7 +131,7 @@ const Index = () => {
             <Button variant="outline" className="hidden md:flex">
               Войти
             </Button>
-            <Button className="bg-primary hover:bg-primary/90">
+            <Button onClick={() => setShowEditor(true)} className="bg-primary hover:bg-primary/90">
               Создать
             </Button>
           </div>
@@ -443,6 +446,20 @@ const Index = () => {
           </div>
         </div>
       </footer>
+
+      <Dialog open={showEditor} onOpenChange={setShowEditor}>
+        <DialogContent className="max-w-[98vw] h-[95vh] p-6">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-bold flex items-center gap-2">
+              <Icon name="Paintbrush" size={24} className="text-primary" />
+              Графический редактор ComicVerse
+            </DialogTitle>
+          </DialogHeader>
+          <div className="mt-4 h-full overflow-hidden">
+            <GraphicEditor />
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
