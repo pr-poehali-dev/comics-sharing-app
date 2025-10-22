@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -22,8 +22,18 @@ interface UserProfileProps {
   onClose: () => void;
 }
 
+const WALLET_URL = 'https://functions.poehali.dev/96f956be-cd72-474f-9b1e-937015b11dbc';
+const PAYMENT_URL = 'https://functions.poehali.dev/bee1b44c-67c7-46cf-a0c5-f54c4771d51d';
+
 const UserProfile = ({ user, onClose }: UserProfileProps) => {
   const [activeTab, setActiveTab] = useState('works');
+  const [wallet, setWallet] = useState<any>(null);
+  const [transactions, setTransactions] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [showWithdrawModal, setShowWithdrawModal] = useState(false);
+  const [withdrawAmount, setWithdrawAmount] = useState('');
+  const [withdrawMethod, setWithdrawMethod] = useState('card');
+  const [cardNumber, setCardNumber] = useState('');
 
   const userWorks = [
     {
@@ -48,12 +58,30 @@ const UserProfile = ({ user, onClose }: UserProfileProps) => {
     }
   ];
 
-  const transactions = [
-    { id: 1, type: 'earning', amount: 450, date: '2024-10-15', description: 'Продажа главы 5' },
-    { id: 2, type: 'earning', amount: 120, date: '2024-10-14', description: 'Подписка читателя' },
-    { id: 3, type: 'withdrawal', amount: -300, date: '2024-10-13', description: 'Вывод средств' },
-    { id: 4, type: 'earning', amount: 200, date: '2024-10-12', description: 'Продажа главы 4' }
-  ];
+  useEffect(() => {
+    loadWallet();
+    loadTransactions();
+  }, []);
+
+  const loadWallet = async () => {
+    try {
+      const response = await fetch(`${WALLET_URL}?user_id=${user.id}`);
+      const data = await response.json();
+      setWallet(data);
+    } catch (error) {
+      console.error('Error loading wallet:', error);
+    }
+  };
+
+  const loadTransactions = async () => {
+    try {
+      const response = await fetch(`${PAYMENT_URL}?user_id=${user.id}`);
+      const data = await response.json();
+      setTransactions(data.transactions || []);
+    } catch (error) {
+      console.error('Error loading transactions:', error);
+    }
+  };
 
   const stats = {
     totalViews: 1801,
@@ -63,12 +91,54 @@ const UserProfile = ({ user, onClose }: UserProfileProps) => {
     followers: 24
   };
 
-  const handleWithdraw = () => {
-    if (user.balance < 500) {
+  const handleWithdraw = async () => {
+    const amount = parseFloat(withdrawAmount);
+    
+    if (!amount || amount < 500) {
       toast.error('Минимальная сумма для вывода 500₽');
       return;
     }
-    toast.success('Заявка на вывод создана');
+
+    if (wallet && amount > wallet.balance) {
+      toast.error('Недостаточно средств');
+      return;
+    }
+
+    if (!cardNumber || cardNumber.length < 4) {
+      toast.error('Введите номер карты');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const response = await fetch(WALLET_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'withdraw',
+          user_id: user.id,
+          amount: amount,
+          payment_method: withdrawMethod,
+          payment_details: { card_number: cardNumber }
+        })
+      });
+
+      if (response.ok) {
+        toast.success('Заявка на вывод создана');
+        setShowWithdrawModal(false);
+        setWithdrawAmount('');
+        setCardNumber('');
+        loadWallet();
+        loadTransactions();
+      } else {
+        const error = await response.json();
+        toast.error(error.error || 'Ошибка вывода');
+      }
+    } catch (error) {
+      toast.error('Ошибка соединения');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -99,9 +169,11 @@ const UserProfile = ({ user, onClose }: UserProfileProps) => {
               <div className="w-full pt-4 border-t border-border">
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-sm text-muted-foreground">Баланс</span>
-                  <span className="text-2xl font-bold text-primary">{user.balance}₽</span>
+                  <span className="text-2xl font-bold text-primary">
+                    {wallet ? wallet.balance : user.balance}₽
+                  </span>
                 </div>
-                <Button onClick={handleWithdraw} className="w-full bg-primary hover:bg-primary/90">
+                <Button onClick={() => setShowWithdrawModal(true)} className="w-full bg-primary hover:bg-primary/90">
                   <Icon name="Wallet" size={16} className="mr-2" />
                   Вывести средства
                 </Button>

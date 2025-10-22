@@ -1,0 +1,35 @@
+{
+  "tests": [
+    {
+      "name": "Test get wallet",
+      "method": "GET",
+      "path": "/?user_id=1",
+      "expectedStatus": 200,
+      "expectedBody": {
+        "id": "number",
+        "balance": "number"
+      },
+      "bodyMatcher": "partial"
+    },
+    {
+      "name": "Test withdrawal request",
+      "method": "POST",
+      "path": "/",
+      "body": {
+        "action": "withdraw",
+        "user_id": 1,
+        "amount": 500,
+        "payment_method": "card",
+        "payment_details": {
+          "card_number": "1234"
+        }
+      },
+      "expectedStatus": 200,
+      "expectedBody": {
+        "withdrawal_id": "number",
+        "status": "pending"
+      },
+      "bodyMatcher": "partial"
+    }
+  ]
+}

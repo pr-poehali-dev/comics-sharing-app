@@ -10,6 +10,7 @@ interface HeaderProps {
   onShowEditor: () => void;
   onShowUpload: () => void;
   onShowProfile: () => void;
+  onShowAdmin?: () => void;
   onNavigate?: (page: 'home' | 'catalog' | 'authors' | 'pricing' | 'community') => void;
 }
 
@@ -21,6 +22,7 @@ const Header = ({
   onShowEditor,
   onShowUpload,
   onShowProfile,
+  onShowAdmin,
   onNavigate
 }: HeaderProps) => {
   const handleEditorClick = () => {
@@ -85,6 +87,11 @@ const Header = ({
                 <span className="text-xs text-muted-foreground">Баланс</span>
                 <span className="text-sm font-bold text-primary">{user.balance}₽</span>
               </div>
+              {user.role === 'admin' && onShowAdmin && (
+                <Button variant="outline" size="icon" onClick={onShowAdmin} title="Админ-панель">
+                  <Icon name="Settings" size={20} />
+                </Button>
+              )}
             </>
           ) : (
             <>

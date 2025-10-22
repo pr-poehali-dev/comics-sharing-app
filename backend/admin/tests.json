@@ -1,0 +1,43 @@
+{
+  "tests": [
+    {
+      "name": "Test get settings",
+      "method": "GET",
+      "path": "/",
+      "expectedStatus": 200,
+      "expectedBody": {
+        "settings": "object"
+      },
+      "bodyMatcher": "partial"
+    },
+    {
+      "name": "Test update platform account",
+      "method": "PUT",
+      "path": "/",
+      "body": {
+        "key": "platform_owner_account",
+        "value": "79001234567"
+      },
+      "expectedStatus": 200,
+      "expectedBody": {
+        "key": "platform_owner_account",
+        "value": "79001234567"
+      },
+      "bodyMatcher": "partial"
+    },
+    {
+      "name": "Test commission report",
+      "method": "POST",
+      "path": "/",
+      "body": {
+        "action": "get_commission_report"
+      },
+      "expectedStatus": 200,
+      "expectedBody": {
+        "platform_earnings": "number",
+        "total_transactions": "number"
+      },
+      "bodyMatcher": "partial"
+    }
+  ]
+}

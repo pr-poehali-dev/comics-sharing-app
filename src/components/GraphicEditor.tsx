@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { toast } from 'sonner';
 import ToolsPanel from './editor/ToolsPanel';
-import CanvasArea from './editor/CanvasArea';
+import ImprovedCanvasArea from './editor/ImprovedCanvasArea';
 import LayersPanel from './editor/LayersPanel';
 
 interface Tool {
@@ -30,6 +30,7 @@ const GraphicEditor = () => {
     { name: 'line', icon: 'Minus', cursor: 'crosshair' },
     { name: 'rectangle', icon: 'Square', cursor: 'crosshair' },
     { name: 'circle', icon: 'Circle', cursor: 'crosshair' },
+    { name: 'triangle', icon: 'Triangle', cursor: 'crosshair' },
     { name: 'text', icon: 'Type', cursor: 'text' },
     { name: 'eyedropper', icon: 'Pipette', cursor: 'crosshair' }
   ];
@@ -122,7 +123,7 @@ const GraphicEditor = () => {
         canRedo={historyStep < history.length - 1}
       />
 
-      <CanvasArea
+      <ImprovedCanvasArea
         currentTool={currentTool}
         brushSize={brushSize}
         color={color}

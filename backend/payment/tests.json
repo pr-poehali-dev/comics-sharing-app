@@ -1,0 +1,31 @@
+{
+  "tests": [
+    {
+      "name": "Test payment creation",
+      "method": "POST",
+      "path": "/",
+      "body": {
+        "user_id": 1,
+        "work_id": 1,
+        "amount": 100,
+        "payment_method": "balance"
+      },
+      "expectedStatus": 200,
+      "expectedBody": {
+        "transaction_id": "number",
+        "status": "success"
+      },
+      "bodyMatcher": "partial"
+    },
+    {
+      "name": "Test get transactions",
+      "method": "GET",
+      "path": "/?user_id=1",
+      "expectedStatus": 200,
+      "expectedBody": {
+        "transactions": "array"
+      },
+      "bodyMatcher": "partial"
+    }
+  ]
+}

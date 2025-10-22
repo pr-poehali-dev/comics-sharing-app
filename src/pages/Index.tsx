@@ -6,6 +6,7 @@ import AuthModal from '@/components/auth/AuthModal';
 import UserProfile from '@/components/profile/UserProfile';
 import UploadWorkModal from '@/components/upload/UploadWorkModal';
 import PurchaseModal from '@/components/monetization/PurchaseModal';
+import AdminPanel from '@/components/admin/AdminPanel';
 import Header from '@/components/home/Header';
 import HeroSection from '@/components/home/HeroSection';
 import FeaturedComics from '@/components/home/FeaturedComics';
@@ -26,6 +27,7 @@ const Index = () => {
   const [showProfile, setShowProfile] = useState(false);
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [showPurchaseModal, setShowPurchaseModal] = useState(false);
+  const [showAdminPanel, setShowAdminPanel] = useState(false);
   const [selectedWork, setSelectedWork] = useState<any>(null);
   const [user, setUser] = useState<any>(null);
 
@@ -166,6 +168,10 @@ const Index = () => {
     return <UserProfile user={user} onClose={() => setShowProfile(false)} />;
   }
 
+  if (showAdminPanel) {
+    return <AdminPanel onClose={() => setShowAdminPanel(false)} />;
+  }
+
   const commonProps = {
     theme,
     user,
@@ -203,6 +209,7 @@ const Index = () => {
         onShowEditor={() => setShowEditor(true)}
         onShowUpload={() => setShowUploadModal(true)}
         onShowProfile={() => setShowProfile(true)}
+        onShowAdmin={() => setShowAdminPanel(true)}
         onNavigate={setCurrentPage}
       />
 
