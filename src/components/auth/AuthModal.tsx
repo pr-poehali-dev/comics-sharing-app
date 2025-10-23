@@ -6,6 +6,8 @@ import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import Icon from '@/components/ui/icon';
 import { toast } from 'sonner';
+import { validateEmail, validatePassword, validateName, sanitizeInput } from '@/utils/validation';
+import LoadingSpinner from '@/components/ui/loading-spinner';
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -20,8 +22,9 @@ const AuthModal = ({ isOpen, onClose, onLogin }: AuthModalProps) => {
   const [registerEmail, setRegisterEmail] = useState('');
   const [registerPassword, setRegisterPassword] = useState('');
   const [registerConfirmPassword, setRegisterConfirmPassword] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!loginEmail || !loginPassword) {
@@ -29,10 +32,18 @@ const AuthModal = ({ isOpen, onClose, onLogin }: AuthModalProps) => {
       return;
     }
 
+    if (!validateEmail(loginEmail)) {
+      toast.error('Некорректный email');
+      return;
+    }
+
+    setLoading(true);
+    await new Promise(resolve => setTimeout(resolve, 500));
+
     const user = {
-      id: Date.now(),
+      id: Math.floor(Math.random() * 2147483647),
       name: 'Пользователь',
-      email: loginEmail,
+      email: sanitizeInput(loginEmail),
       avatar: loginEmail.charAt(0).toUpperCase(),
       balance: 1500,
       role: 'author'
@@ -41,14 +52,32 @@ const AuthModal = ({ isOpen, onClose, onLogin }: AuthModalProps) => {
     localStorage.setItem('comicverse_user', JSON.stringify(user));
     onLogin(user);
     toast.success('Добро пожаловать!');
+    setLoading(false);
     onClose();
   };
 
-  const handleRegister = (e: React.FormEvent) => {
+  const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!registerName || !registerEmail || !registerPassword || !registerConfirmPassword) {
       toast.error('Заполните все поля');
+      return;
+    }
+
+    const nameValidation = validateName(registerName);
+    if (!nameValidation.valid) {
+      toast.error(nameValidation.error);
+      return;
+    }
+
+    if (!validateEmail(registerEmail)) {
+      toast.error('Некорректный email');
+      return;
+    }
+
+    const passwordValidation = validatePassword(registerPassword);
+    if (!passwordValidation.valid) {
+      toast.error(passwordValidation.error);
       return;
     }
 
@@ -57,15 +86,13 @@ const AuthModal = ({ isOpen, onClose, onLogin }: AuthModalProps) => {
       return;
     }
 
-    if (registerPassword.length < 6) {
-      toast.error('Пароль должен быть не менее 6 символов');
-      return;
-    }
+    setLoading(true);
+    await new Promise(resolve => setTimeout(resolve, 800));
 
     const user = {
-      id: Date.now(),
-      name: registerName,
-      email: registerEmail,
+      id: Math.floor(Math.random() * 2147483647),
+      name: sanitizeInput(registerName),
+      email: sanitizeInput(registerEmail),
       avatar: registerName.charAt(0).toUpperCase(),
       balance: 0,
       role: 'author'
@@ -73,7 +100,8 @@ const AuthModal = ({ isOpen, onClose, onLogin }: AuthModalProps) => {
 
     localStorage.setItem('comicverse_user', JSON.stringify(user));
     onLogin(user);
-    toast.success(`Добро пожаловать, ${registerName}!`);
+    toast.success(`Добро пожаловать, ${sanitizeInput(registerName)}!`);
+    setLoading(false);
     onClose();
   };
 
@@ -118,9 +146,13 @@ const AuthModal = ({ isOpen, onClose, onLogin }: AuthModalProps) => {
                 />
               </div>
 
-              <Button type="submit" className="w-full bg-primary hover:bg-primary/90">
-                <Icon name="LogIn" size={16} className="mr-2" />
-                Войти
+              <Button type="submit" className="w-full bg-primary hover:bg-primary/90" disabled={loading}>
+                {loading ? (
+                  <LoadingSpinner size="sm" className="mr-2" />
+                ) : (
+                  <Icon name="LogIn" size={16} className="mr-2" />
+                )}
+                {loading ? 'Вход...' : 'Войти'}
               </Button>
 
               <div className="text-center">
@@ -201,9 +233,13 @@ const AuthModal = ({ isOpen, onClose, onLogin }: AuthModalProps) => {
                 />
               </div>
 
-              <Button type="submit" className="w-full bg-primary hover:bg-primary/90">
-                <Icon name="UserPlus" size={16} className="mr-2" />
-                Создать аккаунт
+              <Button type="submit" className="w-full bg-primary hover:bg-primary/90" disabled={loading}>
+                {loading ? (
+                  <LoadingSpinner size="sm" className="mr-2" />
+                ) : (
+                  <Icon name="UserPlus" size={16} className="mr-2" />
+                )}
+                {loading ? 'Создание...' : 'Создать аккаунт'}
               </Button>
 
               <p className="text-xs text-center text-muted-foreground">

@@ -19,8 +19,10 @@ import Catalog from './Catalog';
 import Authors from './Authors';
 import Pricing from './Pricing';
 import Community from './Community';
+import { useNetworkStatus } from '@/hooks/useNetworkStatus';
 
 const Index = () => {
+  const { isOnline } = useNetworkStatus();
   const [currentPage, setCurrentPage] = useState<'home' | 'catalog' | 'authors' | 'pricing' | 'community'>('home');
   const [theme, setTheme] = useState<'dark' | 'light'>('dark');
   const [viewMode, setViewMode] = useState<'landing' | 'gallery'>('landing');

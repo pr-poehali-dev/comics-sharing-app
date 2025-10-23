@@ -6,8 +6,9 @@ import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import Icon from '@/components/ui/icon';
 import { toast } from 'sonner';
+import { apiGet, apiPost, apiPut, API_ENDPOINTS } from '@/utils/api';
 
-const ADMIN_URL = 'https://functions.poehali.dev/72e3bc71-5445-45ce-ad1f-11671e687ca7';
+
 
 interface AdminPanelProps {
   onClose: () => void;
@@ -39,53 +40,45 @@ const AdminPanel = ({ onClose }: AdminPanelProps) => {
   }, []);
 
   const loadSettings = async () => {
-    try {
-      const response = await fetch(ADMIN_URL);
-      const data = await response.json();
-      setSettings(data.settings);
-      setOwnerAccount(data.settings.platform_owner_account?.value || '');
-    } catch (error) {
-      toast.error('Ошибка загрузки настроек');
+    setLoading(true);
+    const result = await apiGet(API_ENDPOINTS.ADMIN);
+    setLoading(false);
+    
+    if (result.error) {
+      toast.error('Ошибка загрузки настроек: ' + result.error);
+      return;
     }
+    
+    setSettings(result.data.settings);
+    setOwnerAccount(result.data.settings.platform_owner_account?.value || '');
   };
 
   const loadReport = async () => {
-    try {
-      const response = await fetch(ADMIN_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'get_commission_report' })
-      });
-      const data = await response.json();
-      setReport(data);
-    } catch (error) {
-      toast.error('Ошибка загрузки отчёта');
+    const result = await apiPost(API_ENDPOINTS.ADMIN, { action: 'get_commission_report' });
+    
+    if (result.error) {
+      toast.error('Ошибка загрузки отчёта: ' + result.error);
+      return;
     }
+    
+    setReport(result.data);
   };
 
   const updateOwnerAccount = async () => {
     setLoading(true);
-    try {
-      const response = await fetch(ADMIN_URL, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          key: 'platform_owner_account',
-          value: ownerAccount
-        })
-      });
-      
-      if (response.ok) {
-        toast.success('Реквизиты обновлены');
-        loadSettings();
-      } else {
-        toast.error('Ошибка обновления');
-      }
-    } catch (error) {
-      toast.error('Ошибка соединения');
-    } finally {
-      setLoading(false);
+    const result = await apiPut(API_ENDPOINTS.ADMIN, {
+      key: 'platform_owner_account',
+      value: ownerAccount
+    });
+    setLoading(false);
+    
+    if (result.error) {
+      toast.error('Ошибка обновления: ' + result.error);
+      return;
     }
+    
+    toast.success('Реквизиты обновлены');
+    loadSettings();
   };
 
   return (

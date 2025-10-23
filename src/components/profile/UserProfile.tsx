@@ -7,6 +7,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Progress } from '@/components/ui/progress';
 import Icon from '@/components/ui/icon';
 import { toast } from 'sonner';
+import { apiGet, apiPost, API_ENDPOINTS } from '@/utils/api';
+import { validateAmount, validateCardNumber } from '@/utils/validation';
+import LoadingSpinner from '@/components/ui/loading-spinner';
 
 interface User {
   id: number;
@@ -22,8 +25,7 @@ interface UserProfileProps {
   onClose: () => void;
 }
 
-const WALLET_URL = 'https://functions.poehali.dev/96f956be-cd72-474f-9b1e-937015b11dbc';
-const PAYMENT_URL = 'https://functions.poehali.dev/bee1b44c-67c7-46cf-a0c5-f54c4771d51d';
+
 
 const UserProfile = ({ user, onClose }: UserProfileProps) => {
   const [activeTab, setActiveTab] = useState('works');
@@ -64,23 +66,27 @@ const UserProfile = ({ user, onClose }: UserProfileProps) => {
   }, []);
 
   const loadWallet = async () => {
-    try {
-      const response = await fetch(`${WALLET_URL}?user_id=${user.id}`);
-      const data = await response.json();
-      setWallet(data);
-    } catch (error) {
-      console.error('Error loading wallet:', error);
+    setLoading(true);
+    const result = await apiGet(`${API_ENDPOINTS.WALLET}?user_id=${user.id}`);
+    setLoading(false);
+    
+    if (result.error) {
+      toast.error('Не удалось загрузить кошелёк: ' + result.error);
+      return;
     }
+    
+    setWallet(result.data);
   };
 
   const loadTransactions = async () => {
-    try {
-      const response = await fetch(`${PAYMENT_URL}?user_id=${user.id}`);
-      const data = await response.json();
-      setTransactions(data.transactions || []);
-    } catch (error) {
-      console.error('Error loading transactions:', error);
+    const result = await apiGet(`${API_ENDPOINTS.PAYMENT}?user_id=${user.id}`);
+    
+    if (result.error) {
+      console.error('Error loading transactions:', result.error);
+      return;
     }
+    
+    setTransactions(result.data?.transactions || []);
   };
 
   const stats = {
@@ -94,51 +100,39 @@ const UserProfile = ({ user, onClose }: UserProfileProps) => {
   const handleWithdraw = async () => {
     const amount = parseFloat(withdrawAmount);
     
-    if (!amount || amount < 500) {
-      toast.error('Минимальная сумма для вывода 500₽');
+    const amountValidation = validateAmount(amount, 500, wallet?.balance);
+    if (!amountValidation.valid) {
+      toast.error(amountValidation.error);
       return;
     }
 
-    if (wallet && amount > wallet.balance) {
-      toast.error('Недостаточно средств');
-      return;
-    }
-
-    if (!cardNumber || cardNumber.length < 4) {
-      toast.error('Введите номер карты');
+    const cardValidation = validateCardNumber(cardNumber);
+    if (!cardValidation.valid) {
+      toast.error(cardValidation.error);
       return;
     }
 
     setLoading(true);
-    try {
-      const response = await fetch(WALLET_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          action: 'withdraw',
-          user_id: user.id,
-          amount: amount,
-          payment_method: withdrawMethod,
-          payment_details: { card_number: cardNumber }
-        })
-      });
+    const result = await apiPost(API_ENDPOINTS.WALLET, {
+      action: 'withdraw',
+      user_id: user.id,
+      amount: amount,
+      payment_method: withdrawMethod,
+      payment_details: { card_number: cardNumber }
+    });
+    setLoading(false);
 
-      if (response.ok) {
-        toast.success('Заявка на вывод создана');
-        setShowWithdrawModal(false);
-        setWithdrawAmount('');
-        setCardNumber('');
-        loadWallet();
-        loadTransactions();
-      } else {
-        const error = await response.json();
-        toast.error(error.error || 'Ошибка вывода');
-      }
-    } catch (error) {
-      toast.error('Ошибка соединения');
-    } finally {
-      setLoading(false);
+    if (result.error) {
+      toast.error(result.error);
+      return;
     }
+
+    toast.success('Заявка на вывод создана');
+    setShowWithdrawModal(false);
+    setWithdrawAmount('');
+    setCardNumber('');
+    loadWallet();
+    loadTransactions();
   };
 
   return (
