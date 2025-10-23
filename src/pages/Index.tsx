@@ -17,13 +17,12 @@ import Footer from '@/components/home/Footer';
 import GalleryView from '@/components/home/GalleryView';
 import Catalog from './Catalog';
 import Authors from './Authors';
-import Pricing from './Pricing';
 import Community from './Community';
 import { useNetworkStatus } from '@/hooks/useNetworkStatus';
 
 const Index = () => {
   const { isOnline } = useNetworkStatus();
-  const [currentPage, setCurrentPage] = useState<'home' | 'catalog' | 'authors' | 'pricing' | 'community'>('home');
+  const [currentPage, setCurrentPage] = useState<'home' | 'catalog' | 'authors' | 'community'>('home');
   const [theme, setTheme] = useState<'dark' | 'light'>('dark');
   const [viewMode, setViewMode] = useState<'landing' | 'gallery'>('landing');
   const [showEditor, setShowEditor] = useState(false);
@@ -201,9 +200,7 @@ const Index = () => {
     return <Authors {...commonProps} />;
   }
 
-  if (currentPage === 'pricing') {
-    return <Pricing {...commonProps} />;
-  }
+
 
   if (currentPage === 'community') {
     return <Community {...commonProps} />;

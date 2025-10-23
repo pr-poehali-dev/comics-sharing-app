@@ -38,13 +38,14 @@ const PurchaseModal = ({ isOpen, onClose, work, userBalance, onPurchase }: Purch
       return;
     }
 
-    const authorShare = work.price * 0.85;
-    const platformFee = work.price * 0.15;
+    const authorShare = work.price * 0.80;
+    const platformFee = work.price * 0.20;
 
     toast.success(
       <div>
         <p className="font-bold">Покупка успешна!</p>
-        <p className="text-sm">Автор получит {authorShare.toFixed(2)}₽</p>
+        <p className="text-sm">Автор получит {authorShare.toFixed(2)}₽ (80%)</p>
+        <p className="text-xs text-muted-foreground">Комиссия платформы: {platformFee.toFixed(2)}₽ (20%)</p>
       </div>
     );
 
@@ -126,11 +127,11 @@ const PurchaseModal = ({ isOpen, onClose, work, userBalance, onPurchase }: Purch
           <div className="bg-secondary/30 p-4 rounded-lg space-y-2 text-sm">
             <div className="flex justify-between">
               <span className="text-muted-foreground">Автору:</span>
-              <span className="font-medium">{(work.price * 0.85).toFixed(2)}₽ (85%)</span>
+              <span className="font-medium">{(work.price * 0.80).toFixed(2)}₽ (80%)</span>
             </div>
             <div className="flex justify-between">
               <span className="text-muted-foreground">Комиссия платформы:</span>
-              <span className="font-medium">{(work.price * 0.15).toFixed(2)}₽ (15%)</span>
+              <span className="font-medium text-primary">{(work.price * 0.20).toFixed(2)}₽ (20%)</span>
             </div>
           </div>
         </div>

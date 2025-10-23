@@ -13,7 +13,7 @@ interface HeaderProps {
   onShowUpload: () => void;
   onShowProfile: () => void;
   onShowAdmin?: () => void;
-  onNavigate?: (page: 'home' | 'catalog' | 'authors' | 'pricing' | 'community') => void;
+  onNavigate?: (page: 'home' | 'catalog' | 'authors' | 'community') => void;
 }
 
 const Header = ({
@@ -38,22 +38,30 @@ const Header = ({
   };
 
   return (
-    <header className="sticky top-0 z-50 border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-        <button onClick={() => onNavigate?.('home')} className="flex items-center gap-2">
-          <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
-            <Icon name="BookOpen" size={24} className="text-white" />
+    <header className="sticky top-0 z-50 border-b-2 border-foreground/10 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <div className="container mx-auto px-4 py-3 flex items-center justify-between">
+        <button onClick={() => onNavigate?.('home')} className="flex items-center gap-3 group">
+          <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-accent p-0.5 shadow-lg shadow-primary/20">
+            <div className="w-full h-full rounded-full bg-background flex items-center justify-center">
+              <img 
+                src="https://cdn.poehali.dev/projects/cb505cdb-dfe2-48fa-92be-5403d2dbf8d0/files/7a1a0595-f8e5-43b7-a952-6899395a5b1e.jpg" 
+                alt="G-Pen" 
+                className="w-7 h-7 object-contain"
+              />
+            </div>
           </div>
-          <span className="text-2xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-            ComicVerse
-          </span>
+          <div>
+            <span className="text-2xl font-black tracking-tight bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent group-hover:scale-105 transition-transform inline-block">
+              MangaHub
+            </span>
+            <p className="text-[10px] text-muted-foreground font-medium tracking-wider">ARTISTS PARADISE</p>
+          </div>
         </button>
         
         <nav className="hidden md:flex items-center gap-6">
           <button onClick={() => onNavigate?.('catalog')} className="text-sm font-medium hover:text-primary transition-colors">Каталог</button>
           <button onClick={() => onNavigate?.('community')} className="text-sm font-medium hover:text-primary transition-colors">Сообщество</button>
           <button onClick={() => onNavigate?.('authors')} className="text-sm font-medium hover:text-primary transition-colors">Авторы</button>
-          <button onClick={() => onNavigate?.('pricing')} className="text-sm font-medium hover:text-primary transition-colors">Цены</button>
           <button onClick={handleEditorClick} className="text-sm font-medium hover:text-primary transition-colors">
             Редактор
           </button>
