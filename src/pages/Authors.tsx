@@ -18,9 +18,11 @@ interface AuthorsProps {
   onShowUpload: () => void;
   onShowProfile: () => void;
   onBack: () => void;
+  viewMode: 'landing' | 'gallery';
+  onToggleViewMode: () => void;
 }
 
-const Authors = ({ theme, user, onToggleTheme, onShowAuth, onShowEditor, onShowUpload, onShowProfile, onBack }: AuthorsProps) => {
+const Authors = ({ theme, user, onToggleTheme, onShowAuth, onShowEditor, onShowUpload, onShowProfile, onBack, viewMode, onToggleViewMode }: AuthorsProps) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedSort, setSelectedSort] = useState('followers');
   const [followedAuthors, setFollowedAuthors] = useState<number[]>([]);
@@ -153,6 +155,8 @@ const Authors = ({ theme, user, onToggleTheme, onShowAuth, onShowEditor, onShowU
         onShowEditor={onShowEditor}
         onShowUpload={onShowUpload}
         onShowProfile={onShowProfile}
+        viewMode={viewMode}
+        onToggleViewMode={onToggleViewMode}
       />
 
       <div className="container mx-auto px-4 py-8">

@@ -14,9 +14,11 @@ interface PricingProps {
   onShowUpload: () => void;
   onShowProfile: () => void;
   onBack: () => void;
+  viewMode: 'landing' | 'gallery';
+  onToggleViewMode: () => void;
 }
 
-const Pricing = ({ theme, user, onToggleTheme, onShowAuth, onShowEditor, onShowUpload, onShowProfile, onBack }: PricingProps) => {
+const Pricing = ({ theme, user, onToggleTheme, onShowAuth, onShowEditor, onShowUpload, onShowProfile, onBack, viewMode, onToggleViewMode }: PricingProps) => {
   const plans = [
     {
       name: 'Читатель',
@@ -125,6 +127,8 @@ const Pricing = ({ theme, user, onToggleTheme, onShowAuth, onShowEditor, onShowU
         onShowEditor={onShowEditor}
         onShowUpload={onShowUpload}
         onShowProfile={onShowProfile}
+        viewMode={viewMode}
+        onToggleViewMode={onToggleViewMode}
       />
 
       <div className="container mx-auto px-4 py-8">

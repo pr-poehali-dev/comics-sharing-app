@@ -18,9 +18,11 @@ interface CommunityProps {
   onShowUpload: () => void;
   onShowProfile: () => void;
   onBack: () => void;
+  viewMode: 'landing' | 'gallery';
+  onToggleViewMode: () => void;
 }
 
-const Community = ({ theme, user, onToggleTheme, onShowAuth, onShowEditor, onShowUpload, onShowProfile, onBack }: CommunityProps) => {
+const Community = ({ theme, user, onToggleTheme, onShowAuth, onShowEditor, onShowUpload, onShowProfile, onBack, viewMode, onToggleViewMode }: CommunityProps) => {
   const [newPost, setNewPost] = useState('');
   const [likedPosts, setLikedPosts] = useState<number[]>([]);
 
@@ -133,6 +135,8 @@ const Community = ({ theme, user, onToggleTheme, onShowAuth, onShowEditor, onSho
         onShowEditor={onShowEditor}
         onShowUpload={onShowUpload}
         onShowProfile={onShowProfile}
+        viewMode={viewMode}
+        onToggleViewMode={onToggleViewMode}
       />
 
       <div className="container mx-auto px-4 py-8">

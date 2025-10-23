@@ -4,8 +4,10 @@ import Icon from '@/components/ui/icon';
 
 interface HeaderProps {
   theme: 'dark' | 'light';
+  viewMode: 'landing' | 'gallery';
   user: any;
   onToggleTheme: () => void;
+  onToggleViewMode: () => void;
   onShowAuth: () => void;
   onShowEditor: () => void;
   onShowUpload: () => void;
@@ -16,8 +18,10 @@ interface HeaderProps {
 
 const Header = ({
   theme,
+  viewMode,
   user,
   onToggleTheme,
+  onToggleViewMode,
   onShowAuth,
   onShowEditor,
   onShowUpload,
@@ -56,6 +60,16 @@ const Header = ({
         </nav>
 
         <div className="flex items-center gap-3">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={onToggleViewMode}
+            className="hover-scale"
+            title={viewMode === 'landing' ? 'Переключить на галерею' : 'Переключить на лендинг'}
+          >
+            <Icon name={viewMode === 'landing' ? 'LayoutGrid' : 'Layout'} size={20} />
+          </Button>
+          
           <Button
             variant="ghost"
             size="icon"

@@ -14,6 +14,7 @@ import TopsSection from '@/components/home/TopsSection';
 import FeaturesSection from '@/components/home/FeaturesSection';
 import CTASection from '@/components/home/CTASection';
 import Footer from '@/components/home/Footer';
+import GalleryView from '@/components/home/GalleryView';
 import Catalog from './Catalog';
 import Authors from './Authors';
 import Pricing from './Pricing';
@@ -22,6 +23,7 @@ import Community from './Community';
 const Index = () => {
   const [currentPage, setCurrentPage] = useState<'home' | 'catalog' | 'authors' | 'pricing' | 'community'>('home');
   const [theme, setTheme] = useState<'dark' | 'light'>('dark');
+  const [viewMode, setViewMode] = useState<'landing' | 'gallery'>('landing');
   const [showEditor, setShowEditor] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
@@ -41,6 +43,10 @@ const Index = () => {
   const toggleTheme = () => {
     setTheme(theme === 'dark' ? 'light' : 'dark');
     document.documentElement.classList.toggle('dark');
+  };
+
+  const toggleViewMode = () => {
+    setViewMode(viewMode === 'landing' ? 'gallery' : 'landing');
   };
 
   const handleLogin = (userData: any) => {
@@ -174,8 +180,10 @@ const Index = () => {
 
   const commonProps = {
     theme,
+    viewMode,
     user,
     onToggleTheme: toggleTheme,
+    onToggleViewMode: toggleViewMode,
     onShowAuth: () => setShowAuthModal(true),
     onShowEditor: () => setShowEditor(true),
     onShowUpload: () => setShowUploadModal(true),
@@ -203,8 +211,10 @@ const Index = () => {
     <div className="min-h-screen transition-colors duration-300">
       <Header
         theme={theme}
+        viewMode={viewMode}
         user={user}
         onToggleTheme={toggleTheme}
+        onToggleViewMode={toggleViewMode}
         onShowAuth={() => setShowAuthModal(true)}
         onShowEditor={() => setShowEditor(true)}
         onShowUpload={() => setShowUploadModal(true)}
@@ -213,25 +223,34 @@ const Index = () => {
         onNavigate={setCurrentPage}
       />
 
-      <HeroSection
-        user={user}
-        onShowEditor={() => setShowEditor(true)}
-        onShowAuth={() => setShowAuthModal(true)}
-      />
+      {viewMode === 'landing' ? (
+        <>
+          <HeroSection
+            user={user}
+            onShowEditor={() => setShowEditor(true)}
+            onShowAuth={() => setShowAuthModal(true)}
+          />
 
-      <FeaturedComics
-        comics={featuredComics}
-        onReadClick={handleReadClick}
-      />
+          <FeaturedComics
+            comics={featuredComics}
+            onReadClick={handleReadClick}
+          />
 
-      <TopsSection
-        topAuthors={topAuthors}
-        featuredComics={featuredComics}
-      />
+          <TopsSection
+            topAuthors={topAuthors}
+            featuredComics={featuredComics}
+          />
 
-      <FeaturesSection />
+          <FeaturesSection />
 
-      <CTASection onShowAuth={() => setShowAuthModal(true)} />
+          <CTASection onShowAuth={() => setShowAuthModal(true)} />
+        </>
+      ) : (
+        <GalleryView
+          works={featuredComics}
+          onReadClick={handleReadClick}
+        />
+      )}
 
       <Footer onNavigate={setCurrentPage} />
 

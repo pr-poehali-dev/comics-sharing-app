@@ -17,9 +17,11 @@ interface CatalogProps {
   onShowUpload: () => void;
   onShowProfile: () => void;
   onBack: () => void;
+  viewMode: 'landing' | 'gallery';
+  onToggleViewMode: () => void;
 }
 
-const Catalog = ({ theme, user, onToggleTheme, onShowAuth, onShowEditor, onShowUpload, onShowProfile, onBack }: CatalogProps) => {
+const Catalog = ({ theme, user, onToggleTheme, onShowAuth, onShowEditor, onShowUpload, onShowProfile, onBack, viewMode, onToggleViewMode }: CatalogProps) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedGenre, setSelectedGenre] = useState('all');
   const [selectedSort, setSelectedSort] = useState('popular');
@@ -174,6 +176,8 @@ const Catalog = ({ theme, user, onToggleTheme, onShowAuth, onShowEditor, onShowU
         onShowEditor={onShowEditor}
         onShowUpload={onShowUpload}
         onShowProfile={onShowProfile}
+        viewMode={viewMode}
+        onToggleViewMode={onToggleViewMode}
       />
 
       <div className="container mx-auto px-4 py-8">
